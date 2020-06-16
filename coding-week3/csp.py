@@ -72,7 +72,7 @@ class CSP(search.Problem):
     def display(self, assignment):
         "Show a human-readable representation of the CSP."
         # Subclasses can print in a prettier way, or display with a GUI
-        print 'CSP:', self, 'with assignment:', assignment
+        print('CSP:', self, 'with assignment:', assignment)
 
     ## These methods are for the tree- and graph-search interface:
 
@@ -87,8 +87,9 @@ class CSP(search.Problem):
             return [(var, val) for val in self.domains[var]
                     if self.nconflicts(var, val, assignment) == 0]
 
-    def result(self, state, (var, val)):
-        "Perform an action and return the new state."
+    def result(self, state, action):
+        """Perform an action and return the new state."""
+        (var, val) = action
         return state + ((var, val),)
 
     def goal_test(self, state):
@@ -459,13 +460,13 @@ class NQueensCSP(CSP):
                 if assignment.get(var,'') == val: ch = 'Q'
                 elif (var+val) % 2 == 0: ch = '.'
                 else: ch = '-'
-                print ch,
-            print '    ',
+                print(ch, end=' ')
+            print('    ', end=' ')
             for var in range(n):
                 if assignment.get(var,'') == val: ch = '*'
                 else: ch = ' '
-                print str(self.nconflicts(var, val, assignment))+ch,
-            print
+                print(str(self.nconflicts(var, val, assignment)) + ch, end=' ')
+            print()
 
 #______________________________________________________________________________
 # Sudoku
@@ -477,6 +478,18 @@ def flatten(seqs): return sum(seqs, [])
 easy1   = '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
 harder1 = '4173698.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
 
+_R3 = list(range(3))
+_CELL = itertools.count().__next__
+_BGRID = [[[[_CELL() for x in _R3] for y in _R3] for bx in _R3] for by in _R3]
+_BOXES = flatten([list(map(flatten, brow)) for brow in _BGRID])
+_ROWS = flatten([list(map(flatten, zip(*brow))) for brow in _BGRID])
+_COLS = list(zip(*_ROWS))
+
+_NEIGHBORS = {v: set() for v in flatten(_ROWS)}
+for unit in map(set, _BOXES + _ROWS + _COLS):
+    for v in unit:
+        _NEIGHBORS[v].update(unit - {v})
+        
 class Sudoku(CSP):
     """A Sudoku problem.
     The box grid is a 3x3 array of boxes, each a 3x3 array of cells.
@@ -511,18 +524,14 @@ class Sudoku(CSP):
     >>> h = Sudoku(harder1)
     >>> None != backtracking_search(h, select_unassigned_variable=mrv, inference=forward_checking)
     True
-    """
-    R3 = range(3)
-    Cell = itertools.count().next
-    bgrid = [[[[Cell() for x in R3] for y in R3] for bx in R3] for by in R3]
-    boxes = flatten([map(flatten, brow)       for brow in bgrid])
-    rows  = flatten([map(flatten, zip(*brow)) for brow in bgrid])
-    cols  = zip(*rows)
-
-    neighbors = dict([(v, set()) for v in flatten(rows)])
-    for unit in map(set, boxes + rows + cols):
-        for v in unit:
-            neighbors[v].update(unit - set([v]))
+    """    
+    R3 = _R3
+    Cell = _CELL
+    bgrid = _BGRID
+    boxes = _BOXES
+    rows = _ROWS
+    cols = _COLS
+    neighbors = _NEIGHBORS
 
     def __init__(self, grid):
         """Build a Sudoku problem from a string representing the grid:
@@ -540,8 +549,8 @@ class Sudoku(CSP):
         def show_box(box): return [' '.join(map(show_cell, row)) for row in box]
         def show_cell(cell): return str(assignment.get(cell, '.'))
         def abut(lines1, lines2): return map(' | '.join, zip(lines1, lines2))
-        print '\n------+-------+------\n'.join(
-            '\n'.join(reduce(abut, map(show_box, brow))) for brow in self.bgrid)
+        print('\n------+-------+------\n'.join(
+            '\n'.join(reduce(abut, map(show_box, brow))) for brow in self.bgrid))
 
 #______________________________________________________________________________
 # The Zebra Puzzle
@@ -598,10 +607,10 @@ def solve_zebra(algorithm=min_conflicts, **args):
     z = Zebra()
     ans = algorithm(z, **args)
     for h in range(1, 6):
-        print 'House', h,
+        print('House', h, end=" ")
         for (var, val) in ans.items():
-            if val == h: print var,
-        print
+            if val == h: print(var, end=" ")
+        print()
     return ans['Zebra'], ans['Water'], z.nassigns, ans
 
 

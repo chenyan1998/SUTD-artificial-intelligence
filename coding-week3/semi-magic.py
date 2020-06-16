@@ -17,10 +17,21 @@ def solve_semi_magic(algorithm=backtracking_search, **args):
     #########################################
     # Fill in these definitions
 
-    csp_domains = None
-    csp_neighbors = None
+    csp_domains = {f'V{i}':[1,2,3] for i in range(1,10)}
+    csp_neighbors = {
+        'V1': ['V2', 'V3', 'V4', 'V7', 'V5', 'V9'],
+        'V2': ['V1', 'V3', 'V5', 'V8'],
+        'V3': ['V1', 'V2', 'V5', 'V7', 'V6', 'V9'],
+        'V4': ['V1', 'V7', 'V5', 'V6'],
+        'V5': ['V1', 'V2', 'V3', 'V4', 'V6', 'V7', 'V8', 'V9'],
+        'V6': ['V3', 'V4', 'V5', 'V9'],
+        'V7': ['V1', 'V4', 'V5', 'V3', 'V8', 'V9'],
+        'V8': ['V7', 'V2', 'V5', 'V9'],
+        'V9': ['V1', 'V5', 'V3', 'V6', 'V7', 'V8'],
+    }
+    
     def csp_constraints(A, a, B, b):
-        pass
+        return a == b
 
     #########################################
     
