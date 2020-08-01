@@ -1103,7 +1103,7 @@ class dataset_imagenetvalpart(Dataset):
       
 
       nm=os.path.join(root, name)
-      print(nm)
+#       print(nm)
       if (maxnum >0) and ct>= (maxnum + skip):
         break
       self.imgfilenames.append(nm)
